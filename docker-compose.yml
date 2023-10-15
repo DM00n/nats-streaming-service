@@ -1,0 +1,47 @@
+version: "1.0"
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres:16
+    environment:
+      POSTGRES_DB: "db"
+      POSTGRES_USER: "pguser"
+      POSTGRES_PASSWORD: "pgpass"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ../db-data:/var/lib/postgresql/pgdata
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pguser -d db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - postgres
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "pguser@ya.ru"
+      PGADMIN_DEFAULT_PASSWORD: "pgadminpwd"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    networks:
+      - postgres
+
+volumes:
+  habrdb-data:
+  pgadmin-data:
+
+networks:
+  postgres:
+    driver: bridge
