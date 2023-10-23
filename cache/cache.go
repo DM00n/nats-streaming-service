@@ -2,16 +2,15 @@ package cache
 
 type Order struct {
 	Id   string `json:"order_uid"`
-	Data []byte
+	Data string
 }
 
 type Cache struct {
-	//sync.RWMutex
-	items map[string][]byte
+	items map[string]string
 }
 
 func NewCache(orders []Order) *Cache {
-	items := make(map[string][]byte)
+	items := make(map[string]string)
 	for _, item := range orders {
 		items[item.Id] = item.Data
 	}
@@ -23,17 +22,15 @@ func NewCache(orders []Order) *Cache {
 
 func (c *Cache) AddOrder(id string, order []byte) bool {
 	_, ok := c.items[id]
-	//c.RWMutex.Lock()
-	c.items[id] = order
-	//c.RWMutex.Unlock()
+	c.items[id] = string(order)
 	return ok
 }
 
-func (c *Cache) Get(id string) []byte {
+func (c *Cache) Get(id string) Order {
 	order, ok := c.items[id]
 	if ok {
-		return order
+		return Order{id, string(order)}
 	} else {
-		return nil
+		return Order{}
 	}
 }

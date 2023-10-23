@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <title>Домашняя страница - WB Service</title>
+        <link rel='stylesheet' href='/static/css/main.css'>
+    </head>
+    <body>
+        <header>
+            <h1><a href='/'>WB Service</a></h1>
+        </header>
+        <main>
+            <form class="d-flex" method="POST">
+                <input name="orderID" class="form-control me-2" type="search" placeholder="Введите ID заказа">
+                <button class="btn btn-outline-success" type="submit">Отправить</button>
+            </form>
+            <h2>Заказ {{.Id}}</h2>
+            <div class="form-floating">
+                <textarea class="form" placeholder="Заказа с таким ID не найдено" id="floatingTextarea" disabled>{{.Data}}</textarea>
+            </div>
+        </main>
+        <script src="/static/js/main.js" type="text/javascript"></script>
+    </body>
+</html>

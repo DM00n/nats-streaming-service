@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	_ "github.com/lib/pq"
 	"os"
 	"os/signal"
 	"wbService/cache"
 	"wbService/pg"
 	"wbService/stan"
+	"wbService/web"
 )
 
 const (
@@ -33,21 +35,17 @@ func main() {
 	var list []cache.Order
 	var asd cache.Order
 	for rows.Next() {
-		rows.Scan(&asd.Id, &asd.Data)
+		CheckError(rows.Scan(&asd.Id, &asd.Data))
 		list = append(list, asd)
 	}
-	rows.Close()
+	CheckError(rows.Close())
 
 	cch := cache.NewCache(list)
 
 	natsCon, err := stan.NewStanConnect()
 	CheckError(err)
 
-	//http.HandleFunc("/", web.Handler)
-	//err = http.ListenAndServe(":8080", nil)
-	//if err != nil {
-	//	log.Fatal("ListenAndServe: ", err)
-	//}
+	go web.StartHTTP(cch)
 
 	sub, err := natsCon.Sub(
 		func(m []byte) {
@@ -93,18 +91,3 @@ func main() {
 	<-cleanupDone
 
 }
-
-//func MessageHandler(m []byte) {
-//	println(string(m))
-//	if !json.Valid(m) {
-//		fmt.Println("invalid JSON string:", string(m))
-//		return
-//	}
-//	var str cache.Order
-//	err := json.Unmarshal(m, &str)
-//
-//	if err != nil {
-//		println(err.Error())
-//		return
-//	}
-//}
